@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Features - Sora 2 AI Video Generation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-space: #0A0E1A;
+            --electric-cyan: #00D4FF;
+            --neon-purple: #8B5CF6;
+            --warm-orange: #FF6B35;
+            --cool-green: #10B981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--deep-space);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.8);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            border: 2px solid var(--electric-cyan);
+            color: var(--electric-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--electric-cyan);
+            color: var(--deep-space);
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--electric-cyan);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+
+        .demo-container {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .comparison-table {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .comparison-row {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: background 0.3s ease;
+        }
+
+        .comparison-row:hover {
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .check-icon {
+            color: var(--cool-green);
+        }
+
+        .x-icon {
+            color: var(--warm-orange);
+        }
+
+        .tech-spec {
+            background: rgba(255, 255, 255, 0.03);
+            border-left: 4px solid var(--electric-cyan);
+            padding: 16px;
+            margin: 12px 0;
+        }
+
+        .api-endpoint {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-white hover:text-cyan-400 transition-colors">Home</a>
+                <a href="#" class="text-cyan-400">Features</a>
+                <a href="gallery.html" class="text-white hover:text-cyan-400 transition-colors">Gallery</a>
+                <a href="about.html" class="text-white hover:text-cyan-400 transition-colors">About</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="btn-secondary px-4 py-2 rounded-lg">Sign In</button>
+                <button class="btn-primary px-4 py-2 rounded-lg">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 reveal">
+                Advanced <span class="text-gradient">Features</span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto reveal">
+                Discover the powerful capabilities that make Sora 2 the most advanced AI video generation platform available
+            </p>
+        </div>
+    </section>
+
+    <!-- Core Features -->
+    <section class="py-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+                <div class="reveal">
+                    <h2 class="text-3xl font-bold mb-6">Text-to-Video Generation</h2>
+                    <p class="text-gray-300 mb-6">
+                        Our most advanced feature transforms written descriptions into high-quality videos using state-of-the-art diffusion models. Simply describe your vision and watch as AI brings it to life with remarkable detail and accuracy.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="tech-spec">
+                            <h4 class="font-semibold text-cyan-400 mb-2">Advanced Neural Networks</h4>
+                            <p class="text-sm text-gray-300">Built on transformer architecture with 12 billion parameters for unprecedented video quality</p>
+                        </div>
+                        <div class="tech-spec">
+                            <h4 class="font-semibold text-cyan-400 mb-2">Multi-modal Understanding</h4>
+                            <p class="text-sm text-gray-300">Processes text, understands spatial relationships, and generates coherent motion</p>
+                        </div>
+                        <div class="tech-spec">
+                            <h4 class="font-semibold text-cyan-400 mb-2">Temporal Consistency</h4>
+                            <p class="text-sm text-gray-300">Maintains object identity and scene continuity across all frames</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="demo-container reveal">
+                    <div class="bg-gray-800 rounded-lg p-6 mb-4">
+                        <h4 class="font-mono text-sm text-cyan-400 mb-3">Example Prompt</h4>
+                        <p class="text-gray-300 font-mono text-sm leading-relaxed">
+                            "A cinematic wide shot of a cyberpunk city at night with neon lights reflecting on wet streets,
+                            flying cars passing between towering skyscrapers, and a lone figure in a trench coat walking
+                            through the scene, atmospheric lighting with blue and purple tones"
+                        </p>
+                    </div>
+                    <div class="bg-gradient-to-r from-cyan-500 to-purple-600 rounded-lg h-48 flex items-center justify-center">
+                        <div class="text-white text-center">
+                            <div class="text-6xl mb-2">🎬</div>
+                            <div class="text-lg font-semibold">Generated Video Preview</div>
+                            <div class="text-sm opacity-80">16:9 • 4K • 30fps</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Style Customization -->
+            <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+                <div class="demo-container reveal order-2 lg:order-1">
+                    <div class="grid grid-cols-2 gap-4 mb-6">
+                        <div class="bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-4 text-center">
+                            <div class="text-3xl mb-2">🎭</div>
+                            <div class="font-semibold">Cinematic</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-green-500 to-teal-600 rounded-lg p-4 text-center">
+                            <div class="text-3xl mb-2">🎨</div>
+                            <div class="font-semibold">Artistic</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-orange-500 to-red-600 rounded-lg p-4 text-center">
+                            <div class="text-3xl mb-2">📺</div>
+                            <div class="font-semibold">Commercial</div>
+                        </div>
+                        <div class="bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg p-4 text-center">
+                            <div class="text-3xl mb-2">🎪</div>
+                            <div class="font-semibold">Animated</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <button class="btn-primary px-6 py-3 rounded-lg">Try Style Mixer</button>
+                    </div>
+                </div>
+                <div class="reveal order-1 lg:order-2">
+                    <h2 class="text-3xl font-bold mb-6">Style Customization</h2>
+                    <p class="text-gray-300 mb-6">
+                        Choose from multiple pre-trained style models or create your own unique aesthetic. Each style is optimized for different use cases and visual preferences.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="feature-card p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Cinematic</h4>
+                            <p class="text-sm text-gray-400">Film-quality lighting and composition</p>
+                        </div>
+                        <div class="feature-card p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Animated</h4>
+                            <p class="text-sm text-gray-400">Cartoon and stylized visuals</p>
+                        </div>
+                        <div class="feature-card p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Documentary</h4>
+                            <p class="text-sm text-gray-400">Realistic and informative style</p>
+                        </div>
+                        <div class="feature-card p-4 rounded-lg">
+                            <h4 class="font-semibold mb-2">Commercial</h4>
+                            <p class="text-sm text-gray-400">Marketing and advertising focus</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technical Specifications -->
+            <div class="reveal">
+                <h2 class="text-3xl font-bold mb-8 text-center">Technical Specifications</h2>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 text-cyan-400">Video Quality</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• Up to 4K resolution (3840×2160)</li>
+                            <li>• 24, 30, or 60 fps output</li>
+                            <li>• HDR color support</li>
+                            <li>• Professional color grading</li>
+                            <li>• Noise reduction algorithms</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 text-cyan-400">Audio Integration</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• AI-generated sound effects</li>
+                            <li>• Background music composition</li>
+                            <li>• Voice synthesis capabilities</li>
+                            <li>• Audio-visual synchronization</li>
+                            <li>• Multi-track audio support</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 text-cyan-400">Performance</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• Average 2-minute generation time</li>
+                            <li>• Real-time preview capability</li>
+                            <li>• Batch processing support</li>
+                            <li>• GPU acceleration enabled</li>
+                            <li>• Cloud-based infrastructure</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 text-cyan-400">Input Formats</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• Text prompts (500+ characters)</li>
+                            <li>• Reference images</li>
+                            <li>• Style guides</li>
+                            <li>• Storyboard inputs</li>
+                            <li>• Audio references</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 text-cyan-400">Output Formats</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• MP4 (H.264/HEVC)</li>
+                            <li>• MOV (ProRes)</li>
+                            <li>• WebM (VP9)</li>
+                            <li>• GIF animation</li>
+                            <li>• Image sequence</li>
+                        </ul>
+                    </div>
+
+                    <div class="feature-card p-6 rounded-xl">
+                        <h3 class="text-xl font-bold mb-4 text-cyan-400">Integration</h3>
+                        <ul class="space-y-2 text-gray-300">
+                            <li>• RESTful API access</li>
+                            <li>• Webhook notifications</li>
+                            <li>• SDK for popular languages</li>
+                            <li>• Plugin architecture</li>
+                            <li>• Cloud storage integration</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Documentation -->
+    <section class="py-16 px-6 reveal">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center">Developer API</h2>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Quick Start</h3>
+                    <div class="api-endpoint">
+                        <div class="text-sm text-cyan-400 mb-2">POST /api/v1/videos/generate</div>
+                        <div class="text-xs text-gray-400">
+                            { "prompt": "Your video description", "style": "cinematic", "duration": 10 }
+                        </div>
+                    </div>
+                    <div class="api-endpoint">
+                        <div class="text-sm text-cyan-400 mb-2">GET /api/v1/videos/{id}</div>
+                        <div class="text-xs text-gray-400">Retrieve video status and download URL</div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold mb-4">Code Example</h3>
+                    <div class="bg-gray-800 rounded-lg p-4 font-mono text-sm">
+                        <div class="text-cyan-400">const sora2 = require('sora2-api');</div>
+                        <div class="text-white mt-2">const client = new sora2.Client('your-api-key');</div>
+                        <div class="text-white mt-2">const video = await client.videos.generate({</div>
+                        <div class="text-gray-300 ml-4">prompt: 'A beautiful sunset over mountains',</div>
+                        <div class="text-gray-300 ml-4">style: 'cinematic',</div>
+                        <div class="text-gray-300 ml-4">duration: 15</div>
+                        <div class="text-white">});</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="py-16 px-6 reveal">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold mb-8 text-center">Platform Comparison</h2>
+            <div class="comparison-table">
+                <div class="comparison-row p-4 font-semibold bg-gray-800">
+                    <div class="grid grid-cols-4 gap-4">
+                        <div>Feature</div>
+                        <div class="text-center">Sora 2</div>
+                        <div class="text-center">Competitor A</div>
+                        <div class="text-center">Competitor B</div>
+                    </div>
+                </div>
+
+                <div class="comparison-row p-4">
+                    <div class="grid grid-cols-4 gap-4 items-center">
+                        <div>4K Resolution</div>
+                        <div class="text-center check-icon">✓</div>
+                        <div class="text-center x-icon">✗</div>
+                        <div class="text-center check-icon">✓</div>
+                    </div>
+                </div>
+
+                <div class="comparison-row p-4">
+                    <div class="grid grid-cols-4 gap-4 items-center">
+                        <div>Audio Generation</div>
+                        <div class="text-center check-icon">✓</div>
+                        <div class="text-center x-icon">✗</div>
+                        <div class="text-center x-icon">✗</div>
+                    </div>
+                </div>
+
+                <div class="comparison-row p-4">
+                    <div class="grid grid-cols-4 gap-4 items-center">
+                        <div>Real-time Preview</div>
+                        <div class="text-center check-icon">✓</div>
+                        <div class="text-center x-icon">✗</div>
+                        <div class="text-center x-icon">✗</div>
+                    </div>
+                </div>
+
+                <div class="comparison-row p-4">
+                    <div class="grid grid-cols-4 gap-4 items-center">
+                        <div>API Access</div>
+                        <div class="text-center check-icon">✓</div>
+                        <div class="text-center check-icon">✓</div>
+                        <div class="text-center x-icon">✗</div>
+                    </div>
+                </div>
+
+                <div class="comparison-row p-4">
+                    <div class="grid grid-cols-4 gap-4 items-center">
+                        <div>Team Collaboration</div>
+                        <div class="text-center check-icon">✓</div>
+                        <div class="text-center x-icon">✗</div>
+                        <div class="text-center check-icon">✓</div>
+                    </div>
+                </div>
+
+                <div class="comparison-row p-4">
+                    <div class="grid grid-cols-4 gap-4 items-center">
+                        <div>Custom Model Training</div>
+                        <div class="text-center check-icon">✓</div>
+                        <div class="text-center x-icon">✗</div>
+                        <div class="text-center x-icon">✗</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <p class="text-gray-400 mb-6">
+                © 2024 Sora 2 AI Video Generation Platform. All rights reserved.
+            </p>
+            <div class="text-sm text-gray-500">
+                Empowering creativity through artificial intelligence
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize scroll animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Add hover effects to feature cards
+            const featureCards = document.querySelectorAll('.feature-card');
+            featureCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    anime({
+                        targets: this,
+                        translateY: -8,
+                        duration: 300,
+                        easing: 'easeOutQuad'
+                    });
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    anime({
+                        targets: this,
+                        translateY: 0,
+                        duration: 300,
+                        easing: 'easeOutQuad'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

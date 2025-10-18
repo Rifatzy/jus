@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Sora 2 AI Video Generation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-space: #0A0E1A;
+            --electric-cyan: #00D4FF;
+            --neon-purple: #8B5CF6;
+            --warm-orange: #FF6B35;
+            --cool-green: #10B981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--deep-space);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.8);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            border: 2px solid var(--electric-cyan);
+            color: var(--electric-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--electric-cyan);
+            color: var(--deep-space);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+
+        .team-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .team-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--electric-cyan);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.5rem;
+            width: 12px;
+            height: 12px;
+            background: var(--electric-cyan);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.2);
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 1.5rem;
+            width: 2px;
+            height: calc(100% + 1rem);
+            background: linear-gradient(to bottom, var(--electric-cyan), transparent);
+        }
+
+        .timeline-item:last-child::after {
+            display: none;
+        }
+
+        .value-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .value-card:hover {
+            border-color: var(--electric-cyan);
+            background: rgba(0, 212, 255, 0.05);
+        }
+
+        .mission-section {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            padding: 48px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin: 48px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--electric-cyan);
+            margin-bottom: 8px;
+        }
+
+        .contact-form {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+        }
+
+        .form-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px 16px;
+            width: 100%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--electric-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-white hover:text-cyan-400 transition-colors">Home</a>
+                <a href="features.html" class="text-white hover:text-cyan-400 transition-colors">Features</a>
+                <a href="gallery.html" class="text-white hover:text-cyan-400 transition-colors">Gallery</a>
+                <a href="#" class="text-cyan-400">About</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="btn-secondary px-4 py-2 rounded-lg">Sign In</button>
+                <button class="btn-primary px-4 py-2 rounded-lg">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 reveal">
+                About <span class="text-gradient">Sora 2</span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto reveal">
+                We're on a mission to democratize video creation through advanced AI technology,
+                making professional-quality video production accessible to everyone.
+            </p>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="px-6 mb-16">
+        <div class="max-w-4xl mx-auto">
+            <div class="mission-section reveal">
+                <h2 class="text-3xl font-bold mb-6">Our Mission</h2>
+                <p class="text-lg text-gray-300 mb-8 leading-relaxed">
+                    At Sora 2, we believe that creativity should never be limited by technical barriers or resources.
+                    Our mission is to empower creators, businesses, and dreamers worldwide with cutting-edge AI technology
+                    that transforms imagination into reality. We're building the future of video creation, where anyone
+                    can bring their stories to life with unprecedented quality and speed.
+                </p>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="value-card">
+                        <div class="w-16 h-16 bg-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Innovation</h3>
+                        <p class="text-gray-400">Pushing the boundaries of what's possible with AI video generation</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Accessibility</h3>
+                        <p class="text-gray-400">Making professional video creation available to everyone</p>
+                    </div>
+                    <div class="value-card">
+                        <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Quality</h3>
+                        <p class="text-gray-400">Delivering exceptional results that exceed expectations</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics -->
+    <section class="px-6 mb-16">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 reveal">Our Impact</h2>
+            <div class="stats-grid">
+                <div class="stat-item reveal">
+                    <div class="stat-number" data-target="2500000">0</div>
+                    <div class="text-gray-400">Videos Created</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number" data-target="180000">0</div>
+                    <div class="text-gray-400">Active Users</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number" data-target="98">0</div>
+                    <div class="text-gray-400">% Satisfaction Rate</div>
+                </div>
+                <div class="stat-item reveal">
+                    <div class="stat-number" data-target="45">0</div>
+                    <div class="text-gray-400">Countries Served</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="px-6 mb-16">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 reveal">Meet Our Team</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="team-card p-6 reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
+                        AS
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-2">Alex Smith</h3>
+                    <p class="text-cyan-400 text-center mb-3">CEO & Co-Founder</p>
+                    <p class="text-gray-400 text-sm text-center">
+                        Former AI researcher at leading tech companies, passionate about democratizing creative tools.
+                    </p>
+                </div>
+
+                <div class="team-card p-6 reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-purple-500 to-pink-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
+                        MC
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-2">Maria Chen</h3>
+                    <p class="text-cyan-400 text-center mb-3">CTO & Co-Founder</p>
+                    <p class="text-gray-400 text-sm text-center">
+                        Computer vision expert with 10+ years experience in machine learning and neural networks.
+                    </p>
+                </div>
+
+                <div class="team-card p-6 reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-green-500 to-teal-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
+                        DJ
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-2">David Johnson</h3>
+                    <p class="text-cyan-400 text-center mb-3">Head of Engineering</p>
+                    <p class="text-gray-400 text-sm text-center">
+                        Scalable systems architect specializing in distributed computing and cloud infrastructure.
+                    </p>
+                </div>
+
+                <div class="team-card p-6 reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-orange-500 to-red-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
+                        SK
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-2">Sarah Kim</h3>
+                    <p class="text-cyan-400 text-center mb-3">Lead AI Researcher</p>
+                    <p class="text-gray-400 text-sm text-center">
+                        PhD in Computer Science, published researcher in generative AI and video synthesis.
+                    </p>
+                </div>
+
+                <div class="team-card p-6 reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
+                        RT
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-2">Robert Taylor</h3>
+                    <p class="text-cyan-400 text-center mb-3">Product Director</p>
+                    <p class="text-gray-400 text-sm text-center">
+                        User experience expert with background in creative software and digital media tools.
+                    </p>
+                </div>
+
+                <div class="team-card p-6 reveal">
+                    <div class="w-24 h-24 bg-gradient-to-br from-pink-500 to-rose-600 rounded-full mx-auto mb-4 flex items-center justify-center text-2xl font-bold">
+                        LM
+                    </div>
+                    <h3 class="text-xl font-bold text-center mb-2">Lisa Martinez</h3>
+                    <p class="text-cyan-400 text-center mb-3">Community Manager</p>
+                    <p class="text-gray-400 text-sm text-center">
+                        Creative community builder with deep experience in user engagement and support.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Timeline -->
+    <section class="px-6 mb-16">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 reveal">Our Journey</h2>
+            <div class="space-y-8">
+                <div class="timeline-item reveal">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Company Founded</h3>
+                            <span class="text-cyan-400 font-mono text-sm">2023</span>
+                        </div>
+                        <p class="text-gray-300">
+                            Sora 2 was founded by a team of AI researchers and creative technologists with a shared vision
+                            to revolutionize video creation through artificial intelligence.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Beta Launch</h3>
+                            <span class="text-cyan-400 font-mono text-sm">Q1 2024</span>
+                        </div>
+                        <p class="text-gray-300">
+                            Launched private beta with 1,000 creators and generated over 10,000 videos in the first month.
+                            Received overwhelmingly positive feedback on video quality and ease of use.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Public Release</h3>
+                            <span class="text-cyan-400 font-mono text-sm">Q2 2024</span>
+                        </div>
+                        <p class="text-gray-300">
+                            Official public launch with advanced features including 4K resolution, audio integration,
+                            and real-time preview capabilities. Reached 50,000 users in the first quarter.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Enterprise Platform</h3>
+                            <span class="text-cyan-400 font-mono text-sm">Q3 2024</span>
+                        </div>
+                        <p class="text-gray-300">
+                            Launched enterprise features including API access, team collaboration tools,
+                            and custom model training. Partnered with major media companies and agencies.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item reveal">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xl font-bold">Global Expansion</h3>
+                            <span class="text-cyan-400 font-mono text-sm">Q4 2024</span>
+                        </div>
+                        <p class="text-gray-300">
+                            Expanded to serve creators in 45 countries with localized support and multilingual capabilities.
+                            Achieved 2+ million videos created milestone.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technology Behind Sora 2 -->
+    <section class="px-6 mb-16">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 reveal">Technology Behind Sora 2</h2>
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="reveal">
+                    <h3 class="text-2xl font-bold mb-6">Advanced AI Architecture</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Diffusion Models</h4>
+                                <p class="text-gray-400 text-sm">State-of-the-art diffusion-based generative models trained on millions of high-quality videos</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Transformer Architecture</h4>
+                                <p class="text-gray-400 text-sm">Advanced transformer networks for understanding complex prompts and generating coherent sequences</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Scalable Infrastructure</h4>
+                                <p class="text-gray-400 text-sm">Cloud-native architecture supporting millions of concurrent video generation requests</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4">
+                            <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold mb-2">Audio Synthesis</h4>
+                                <p class="text-gray-400 text-sm">Integrated audio generation system creating synchronized sound effects and music</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="reveal">
+                    <div class="bg-gray-800 rounded-lg p-6">
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-cyan-400">12B</div>
+                                <div class="text-sm text-gray-400">Model Parameters</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-purple-400">10M+</div>
+                                <div class="text-sm text-gray-400">Training Videos</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-green-400">95%</div>
+                                <div class="text-sm text-gray-400">Quality Score</div>
+                            </div>
+                            <div class="text-center">
+                                <div class="text-3xl font-bold text-orange-400">2min</div>
+                                <div class="text-sm text-gray-400">Avg Generation</div>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">🧠</div>
+                            <div class="text-lg font-semibold">Neural Network Visualization</div>
+                            <div class="text-sm text-gray-400 mt-2">Advanced AI architecture powering Sora 2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="px-6 mb-16">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 reveal">Get In Touch</h2>
+            <div class="grid lg:grid-cols-2 gap-12">
+                <div class="reveal">
+                    <h3 class="text-xl font-bold mb-6">Contact Information</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Email</div>
+                                <div class="text-gray-400">hello@sora2.ai</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Location</div>
+                                <div class="text-gray-400">San Francisco, CA</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-4">
+                            <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <div class="font-semibold">Support</div>
+                                <div class="text-gray-400">24/7 online support</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-form reveal">
+                    <h3 class="text-xl font-bold mb-6">Send us a message</h3>
+                    <form class="space-y-4">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="text" class="form-input" placeholder="First Name" required>
+                            <input type="text" class="form-input" placeholder="Last Name" required>
+                        </div>
+                        <input type="email" class="form-input" placeholder="Email Address" required>
+                        <input type="text" class="form-input" placeholder="Subject" required>
+                        <textarea class="form-input form-textarea" placeholder="Your Message" required></textarea>
+                        <button type="submit" class="btn-primary w-full py-3 rounded-lg font-semibold">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <p class="text-gray-400 mb-6">
+                © 2024 Sora 2 AI Video Generation Platform. All rights reserved.
+            </p>
+            <div class="text-sm text-gray-500">
+                Empowering creativity through artificial intelligence
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize scroll animations
+        document.addEventListener('DOMContentLoaded', function() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Initialize stats counters
+            const counters = document.querySelectorAll('.stat-number');
+
+            const statsObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const target = parseInt(counter.getAttribute('data-target'));
+                        animateCounter(counter, target);
+                        statsObserver.unobserve(counter);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            counters.forEach(counter => {
+                statsObserver.observe(counter);
+            });
+
+            // Add hover effects to team cards
+            const teamCards = document.querySelectorAll('.team-card');
+            teamCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    anime({
+                        targets: this,
+                        translateY: -8,
+                        duration: 300,
+                        easing: 'easeOutQuad'
+                    });
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    anime({
+                        targets: this,
+                        translateY: 0,
+                        duration: 300,
+                        easing: 'easeOutQuad'
+                    });
+                });
+            });
+        });
+
+        function animateCounter(element, target) {
+            let current = 0;
+            const increment = target / 100;
+            const duration = 2000;
+            const stepTime = duration / 100;
+
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+
+                if (target >= 1000000) {
+                    element.textContent = (current / 1000000).toFixed(1) + 'M';
+                } else if (target >= 1000) {
+                    element.textContent = (current / 1000).toFixed(0) + 'K';
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, stepTime);
+        }
+
+        // Form submission
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Simulate form submission
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.textContent = 'Sending...';
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                submitBtn.textContent = 'Message Sent!';
+                submitBtn.style.background = 'var(--cool-green)';
+
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.style.background = '';
+                    this.reset();
+                }, 2000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>
