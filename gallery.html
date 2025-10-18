@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - Sora 2 AI Video Generation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-space: #0A0E1A;
+            --electric-cyan: #00D4FF;
+            --neon-purple: #8B5CF6;
+            --warm-orange: #FF6B35;
+            --cool-green: #10B981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--deep-space);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.8);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            border: 2px solid var(--electric-cyan);
+            color: var(--electric-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--electric-cyan);
+            color: var(--deep-space);
+        }
+
+        .video-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .video-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--electric-cyan);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .video-thumbnail {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: rgba(0, 212, 255, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .video-card:hover .play-overlay {
+            opacity: 1;
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+
+        .filter-chip {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .filter-chip:hover,
+        .filter-chip.active {
+            background: var(--electric-cyan);
+            border-color: var(--electric-cyan);
+            color: var(--deep-space);
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            width: 100%;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: var(--electric-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.1);
+        }
+
+        .featured-carousel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stats-badge {
+            background: rgba(0, 212, 255, 0.2);
+            border: 1px solid var(--electric-cyan);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
+            color: var(--electric-cyan);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--deep-space);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 16px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: hidden;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.active .modal-content {
+            transform: scale(1);
+        }
+
+        .video-player {
+            aspect-ratio: 16/9;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="index.html" class="text-white hover:text-cyan-400 transition-colors">Home</a>
+                <a href="features.html" class="text-white hover:text-cyan-400 transition-colors">Features</a>
+                <a href="#" class="text-cyan-400">Gallery</a>
+                <a href="about.html" class="text-white hover:text-cyan-400 transition-colors">About</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="btn-secondary px-4 py-2 rounded-lg">Sign In</button>
+                <button class="btn-primary px-4 py-2 rounded-lg">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6 reveal">
+                Video <span class="text-gradient">Gallery</span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-8 max-w-3xl mx-auto reveal">
+                Explore amazing videos created by our community using Sora 2's AI video generation technology
+            </p>
+        </div>
+    </section>
+
+    <!-- Featured Videos Carousel -->
+    <section class="px-6 mb-16">
+        <div class="max-w-7xl mx-auto">
+            <div class="featured-carousel reveal">
+                <h2 class="text-2xl font-bold mb-6">Featured Creations</h2>
+                <div class="splide" id="featured-carousel">
+                    <div class="splide__track">
+                        <ul class="splide__list">
+                            <li class="splide__slide">
+                                <div class="video-card p-4">
+                                    <div class="video-thumbnail">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-cyan-500 to-purple-600 opacity-80"></div>
+                                        <div class="play-overlay">
+                                            <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="absolute bottom-2 left-2 text-white text-sm font-semibold">4K • 30s</div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h3 class="font-bold text-lg mb-2">Cyberpunk City at Night</h3>
+                                        <p class="text-gray-400 text-sm mb-3">A futuristic metropolis with neon lights and flying cars</p>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-6 h-6 bg-cyan-500 rounded-full"></div>
+                                                <span class="text-sm">@creator_tech</span>
+                                            </div>
+                                            <div class="stats-badge">2.1K views</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="splide__slide">
+                                <div class="video-card p-4">
+                                    <div class="video-thumbnail">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-green-500 to-teal-600 opacity-80"></div>
+                                        <div class="play-overlay">
+                                            <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="absolute bottom-2 left-2 text-white text-sm font-semibold">1080p • 15s</div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h3 class="font-bold text-lg mb-2">Enchanted Forest</h3>
+                                        <p class="text-gray-400 text-sm mb-3">Magical woodland with glowing creatures and mystical atmosphere</p>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-6 h-6 bg-green-500 rounded-full"></div>
+                                                <span class="text-sm">@nature_vibes</span>
+                                            </div>
+                                            <div class="stats-badge">3.7K views</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="splide__slide">
+                                <div class="video-card p-4">
+                                    <div class="video-thumbnail">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-orange-500 to-red-600 opacity-80"></div>
+                                        <div class="play-overlay">
+                                            <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                        <div class="absolute bottom-2 left-2 text-white text-sm font-semibold">4K • 45s</div>
+                                    </div>
+                                    <div class="mt-4">
+                                        <h3 class="font-bold text-lg mb-2">Space Exploration</h3>
+                                        <p class="text-gray-400 text-sm mb-3">Journey through the cosmos with stunning planetary visuals</p>
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center space-x-2">
+                                                <div class="w-6 h-6 bg-orange-500 rounded-full"></div>
+                                                <span class="text-sm">@space_dreamer</span>
+                                            </div>
+                                            <div class="stats-badge">5.2K views</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filter -->
+    <section class="px-6 mb-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-6 items-center justify-between reveal">
+                <div class="flex-1 max-w-md">
+                    <input
+                        type="text"
+                        class="search-bar"
+                        placeholder="Search videos by prompt or creator..."
+                        id="search-input"
+                    >
+                </div>
+                <div class="flex flex-wrap gap-2" id="category-filter-container">
+                    <div class="filter-chip active" data-filter="all">All</div>
+                    <div class="filter-chip" data-filter="cinematic">Cinematic</div>
+                    <div class="filter-chip" data-filter="animated">Animated</div>
+                    <div class="filter-chip" data-filter="nature">Nature</div>
+                    <div class="filter-chip" data-filter="urban">Urban</div>
+                    <div class="filter-chip" data-filter="fantasy">Fantasy</div>
+                    <div class="filter-chip" data-filter="sci-fi">Sci-Fi</div>
+                </div>
+                <div class="flex flex-wrap gap-2" id="resolution-filter-container">
+                    <div class="filter-chip" data-resolution="all">All Resolutions</div>
+                    <div class="filter-chip" data-resolution="4K">4K</div>
+                    <div class="filter-chip" data-resolution="1080p">1080p</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Grid -->
+    <section class="px-6 pb-16">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="video-grid">
+                <!-- Video cards will be populated by JavaScript -->
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-12 reveal">
+                <button class="btn-primary px-8 py-3 rounded-lg" onclick="loadMoreVideos()">
+                    Load More Videos
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Video Modal -->
+    <div class="modal" id="video-modal">
+        <div class="modal-content">
+            <div class="flex items-center justify-between p-6 border-b border-gray-700">
+                <h3 class="text-xl font-bold" id="modal-title">Video Title</h3>
+                <button class="text-gray-400 hover:text-white" onclick="closeModal()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="video-player" id="modal-video">
+                <div class="text-center text-white">
+                    <div class="text-6xl mb-4">🎬</div>
+                    <div class="text-lg font-semibold">AI Generated Video</div>
+                    <div class="text-sm text-gray-400 mt-2">Video preview would play here</div>
+                </div>
+            </div>
+            <div class="p-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold mb-3">Prompt Used</h4>
+                        <p class="text-gray-300 text-sm" id="modal-prompt">Video generation prompt...</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold mb-3">Video Details</h4>
+                        <div class="space-y-2 text-sm text-gray-300">
+                            <div>Style: <span id="modal-style">Cinematic</span></div>
+                            <div>Resolution: <span id="modal-resolution">4K</span></div>
+                            <div>Duration: <span id="modal-duration">30s</span></div>
+                            <div>Created: <span id="modal-date">2 days ago</span></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-6">
+                    <button class="btn-primary px-4 py-2 rounded-lg text-sm">Download</button>
+                    <button class="btn-secondary px-4 py-2 rounded-lg text-sm">Share</button>
+                    <button class="btn-secondary px-4 py-2 rounded-lg text-sm">Use Prompt</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <p class="text-gray-400 mb-6">
+                © 2024 Sora 2 AI Video Generation Platform. All rights reserved.
+            </p>
+            <div class="text-sm text-gray-500">
+                Empowering creativity through artificial intelligence
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let videoData = [];
+        let currentFilter = 'all';
+        let currentResolution = 'all';
+        let displayedVideos = 8;
+
+        // Initialize gallery
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('resources/videos.json')
+                .then(response => response.json())
+                .then(data => {
+                    videoData = data;
+                    initializeCarousel();
+                    initializeFilters();
+                    initializeSearch();
+                    renderVideos();
+                    initializeScrollAnimations();
+                });
+        });
+
+        function initializeCarousel() {
+            new Splide('#featured-carousel', {
+                type: 'loop',
+                perPage: 3,
+                perMove: 1,
+                gap: '1rem',
+                autoplay: true,
+                interval: 5000,
+                breakpoints: {
+                    1024: { perPage: 2 },
+                    768: { perPage: 1 }
+                }
+            }).mount();
+        }
+
+        function initializeFilters() {
+            const categoryFilterContainer = document.getElementById('category-filter-container');
+            const resolutionFilterContainer = document.getElementById('resolution-filter-container');
+
+            categoryFilterContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('filter-chip')) {
+                    categoryFilterContainer.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentFilter = e.target.dataset.filter;
+                    displayedVideos = 8;
+                    renderVideos();
+                }
+            });
+
+            resolutionFilterContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('filter-chip')) {
+                    resolutionFilterContainer.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+                    e.target.classList.add('active');
+                    currentResolution = e.target.dataset.resolution;
+                    displayedVideos = 8;
+                    renderVideos();
+                }
+            });
+        }
+
+        function initializeSearch() {
+            const searchInput = document.getElementById('search-input');
+            searchInput.addEventListener('input', function() {
+                displayedVideos = 8;
+                renderVideos();
+            });
+        }
+
+        function renderVideos() {
+            const grid = document.getElementById('video-grid');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+
+            let filteredVideos = videoData.filter(video => {
+                const matchesFilter = currentFilter === 'all' || video.category === currentFilter;
+                const matchesResolution = currentResolution === 'all' || video.resolution === currentResolution;
+                const matchesSearch = searchTerm === '' ||
+                    video.title.toLowerCase().includes(searchTerm) ||
+                    video.prompt.toLowerCase().includes(searchTerm) ||
+                    video.creator.toLowerCase().includes(searchTerm);
+
+                return matchesFilter && matchesSearch && matchesResolution;
+            });
+
+            const videosToShow = filteredVideos.slice(0, displayedVideos);
+
+            grid.innerHTML = videosToShow.map(video => `
+                <div class="video-card p-4 reveal" onclick="openModal(${video.id})">
+                    <div class="video-thumbnail">
+                        <div class="absolute inset-0 bg-gradient-to-br ${video.color} opacity-80"></div>
+                        <div class="play-overlay">
+                            <svg class="w-6 h-6 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z"/>
+                            </svg>
+                        </div>
+                        <div class="absolute bottom-2 left-2 text-white text-sm font-semibold">${video.resolution} • ${video.duration}</div>
+                        <div class="absolute top-2 right-2">
+                            <div class="stats-badge">${video.views} views</div>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <h3 class="font-bold text-lg mb-2">${video.title}</h3>
+                        <p class="text-gray-400 text-sm mb-3 line-clamp-2">${video.prompt.substring(0, 80)}...</p>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <div class="w-6 h-6 bg-cyan-500 rounded-full"></div>
+                                <span class="text-sm">${video.creator}</span>
+                            </div>
+                            <div class="text-xs text-gray-500">${video.date}</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Re-initialize scroll animations for new elements
+            initializeScrollAnimations();
+        }
+
+        function loadMoreVideos() {
+            displayedVideos += 8;
+            renderVideos();
+        }
+
+        function openModal(videoId) {
+            const video = videoData.find(v => v.id === videoId);
+            if (!video) return;
+
+            document.getElementById('modal-title').textContent = video.title;
+            document.getElementById('modal-prompt').textContent = video.prompt;
+            document.getElementById('modal-style').textContent = video.style;
+            document.getElementById('modal-resolution').textContent = video.resolution;
+            document.getElementById('modal-duration').textContent = video.duration;
+            document.getElementById('modal-date').textContent = video.date;
+
+            const modal = document.getElementById('video-modal');
+            modal.classList.add('active');
+
+            // Animate modal content
+            anime({
+                targets: '.modal-content',
+                scale: [0.9, 1],
+                opacity: [0, 1],
+                duration: 300,
+                easing: 'easeOutQuad'
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('video-modal');
+
+            anime({
+                targets: '.modal-content',
+                scale: [1, 0.9],
+                opacity: [1, 0],
+                duration: 200,
+                easing: 'easeInQuad',
+                complete: () => {
+                    modal.classList.remove('active');
+                }
+            });
+        }
+
+        function initializeScrollAnimations() {
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.reveal:not(.active)').forEach(el => {
+                observer.observe(el);
+            });
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('video-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sora 2 - AI Video Generation Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://unpkg.com/p5@1.7.0/lib/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/css/splide.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --deep-space: #0A0E1A;
+            --electric-cyan: #00D4FF;
+            --neon-purple: #8B5CF6;
+            --warm-orange: #FF6B35;
+            --cool-green: #10B981;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--deep-space);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .bg-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            background: rgba(10, 14, 26, 0.8);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+        }
+
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-secondary {
+            border: 2px solid var(--electric-cyan);
+            color: var(--electric-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--electric-cyan);
+            color: var(--deep-space);
+        }
+
+        .generation-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 16px;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--electric-cyan), var(--neon-purple));
+            height: 4px;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--electric-cyan);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--electric-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+            transition: all 0.6s ease;
+        }
+
+        .particle-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+
+        #p5-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        .stats-counter {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--electric-cyan);
+        }
+
+        .video-preview {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+            border: 2px dashed rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .video-preview.generating {
+            border-style: solid;
+            border-color: var(--electric-cyan);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 212, 255, 0.3);
+            border-top: 3px solid var(--electric-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .prompt-suggestions {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prompt-suggestions:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--electric-cyan);
+        }
+
+        .style-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .style-option {
+            padding: 12px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .style-option:hover,
+        .style-option.selected {
+            border-color: var(--electric-cyan);
+            background: rgba(0, 212, 255, 0.1);
+        }
+
+        .generation-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--electric-cyan);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Particles -->
+    <div class="bg-particles" id="particle-container"></div>
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed top-0 left-0 right-0 z-50 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#" class="text-white hover:text-cyan-400 transition-colors">Home</a>
+                <a href="features.html" class="text-white hover:text-cyan-400 transition-colors">Features</a>
+                <a href="gallery.html" class="text-white hover:text-cyan-400 transition-colors">Gallery</a>
+                <a href="about.html" class="text-white hover:text-cyan-400 transition-colors">About</a>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button class="btn-secondary px-4 py-2 rounded-lg">Sign In</button>
+                <button class="btn-primary px-4 py-2 rounded-lg">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-24 pb-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                    Transform Ideas into
+                    <span class="text-gradient">Video</span>
+                </h1>
+                <p class="text-xl md:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto">
+                    Sora 2 revolutionizes video creation with advanced AI-powered text-to-video generation,
+                    bringing your imagination to life in stunning detail.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <button class="btn-primary px-8 py-4 rounded-lg text-lg font-semibold" onclick="scrollToGenerator()">
+                        Start Creating Free
+                    </button>
+                    <button class="btn-secondary px-8 py-4 rounded-lg text-lg font-semibold" onclick="playDemo()">
+                        Watch Demo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video Generation Studio -->
+            <div id="video-generator" class="generation-card p-8 reveal">
+                <div class="grid lg:grid-cols-3 gap-8">
+                    <!-- Generation Interface -->
+                    <div class="lg:col-span-2">
+                        <h2 class="text-2xl font-bold mb-6">AI Video Generation Studio</h2>
+
+                        <!-- Prompt Input -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-2">Describe your video</label>
+                            <textarea
+                                id="video-prompt"
+                                class="w-full h-24 p-4 bg-gray-800 border border-gray-600 rounded-lg text-white resize-none focus:border-cyan-400 focus:outline-none"
+                                placeholder="A cinematic shot of a futuristic city at sunset with flying cars and neon lights..."
+                                maxlength="500"
+                            ></textarea>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-xs text-gray-400">AI will enhance your prompt for better results</span>
+                                <span id="char-count" class="text-xs text-gray-400">0/500</span>
+                            </div>
+                        </div>
+
+                        <!-- Style Selector -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium mb-3">Video Style</label>
+                            <div class="style-selector">
+                                <div class="style-option selected" data-style="cinematic">
+                                    <div class="text-sm font-medium">Cinematic</div>
+                                    <div class="text-xs text-gray-400">Film quality</div>
+                                </div>
+                                <div class="style-option" data-style="animated">
+                                    <div class="text-sm font-medium">Animated</div>
+                                    <div class="text-xs text-gray-400">Cartoon style</div>
+                                </div>
+                                <div class="style-option" data-style="documentary">
+                                    <div class="text-sm font-medium">Documentary</div>
+                                    <div class="text-xs text-gray-400">Realistic</div>
+                                </div>
+                                <div class="style-option" data-style="commercial">
+                                    <div class="text-sm font-medium">Commercial</div>
+                                    <div class="text-xs text-gray-400">Marketing</div>
+                                </div>
+                                <div class="style-option" data-style="artistic">
+                                    <div class="text-sm font-medium">Artistic</div>
+                                    <div class="text-xs text-gray-400">Creative</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div class="grid md:grid-cols-3 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Duration</label>
+                                <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-cyan-400 focus:outline-none">
+                                    <option value="5">5 seconds</option>
+                                    <option value="10" selected>10 seconds</option>
+                                    <option value="15">15 seconds</option>
+                                    <option value="30">30 seconds</option>
+                                    <option value="60">60 seconds</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Resolution</label>
+                                <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-cyan-400 focus:outline-none">
+                                    <option value="720">720p HD</option>
+                                    <option value="1080" selected>1080p Full HD</option>
+                                    <option value="4k">4K Ultra HD</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Aspect Ratio</label>
+                                <select class="w-full p-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:border-cyan-400 focus:outline-none">
+                                    <option value="16:9" selected>16:9 Landscape</option>
+                                    <option value="9:16">9:16 Portrait</option>
+                                    <option value="1:1">1:1 Square</option>
+                                    <option value="21:9">21:9 Ultrawide</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button
+                            id="generate-btn"
+                            class="btn-primary w-full py-4 rounded-lg text-lg font-semibold mb-4"
+                            onclick="generateVideo()"
+                        >
+                            Generate Video
+                        </button>
+
+                        <!-- Progress Bar -->
+                        <div id="progress-container" class="hidden">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium">Generating your video...</span>
+                                <span id="progress-text" class="text-sm text-cyan-400">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-700 rounded-full h-2">
+                                <div id="progress-bar" class="progress-bar w-0"></div>
+                            </div>
+                            <div id="generation-status" class="text-sm text-gray-400 mt-2">
+                                Initializing AI models...
+                            </div>
+                        </div>
+
+                        <!-- Video Preview -->
+                        <div id="video-preview" class="video-preview mt-6 hidden">
+                            <div class="loading-spinner"></div>
+                            <div class="text-sm text-gray-400 mt-4">Generating video frames...</div>
+                        </div>
+                    </div>
+
+                    <!-- AI Assistant Sidebar -->
+                    <div class="lg:col-span-1">
+                        <div class="generation-card p-6">
+                            <h3 class="text-lg font-bold mb-4">AI Prompt Assistant</h3>
+
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium mb-3 text-cyan-400">Prompt Suggestions</h4>
+                                <div class="space-y-2">
+                                    <div class="prompt-suggestions" onclick="usePrompt(this)">
+                                        A serene Japanese garden with cherry blossoms and a koi pond
+                                    </div>
+                                    <div class="prompt-suggestions" onclick="usePrompt(this)">
+                                        Futuristic space station orbiting Earth with astronauts
+                                    </div>
+                                    <div class="prompt-suggestions" onclick="usePrompt(this)">
+                                        Medieval castle on a mountain during a thunderstorm
+                                    </div>
+                                    <div class="prompt-suggestions" onclick="usePrompt(this)">
+                                        Underwater coral reef with tropical fish and sea turtles
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium mb-3 text-cyan-400">Enhancement Tips</h4>
+                                <div class="text-sm text-gray-300 space-y-2">
+                                    <div>• Include lighting conditions</div>
+                                    <div>• Specify camera angles</div>
+                                    <div>• Add motion descriptions</div>
+                                    <div>• Mention color palettes</div>
+                                </div>
+                            </div>
+
+                            <div class="generation-stats">
+                                <div class="stat-item">
+                                    <div class="stat-value">2.3M</div>
+                                    <div class="stat-label">Videos Created</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">95%</div>
+                                    <div class="stat-label">Quality Score</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">2min</div>
+                                    <div class="stat-label">Avg Generation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-16 px-6 reveal">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4">Powerful AI Video Creation</h2>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Discover the advanced features that make Sora 2 the leading AI video generation platform
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card p-6 rounded-xl">
+                    <div class="w-12 h-12 bg-cyan-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Text-to-Video AI</h3>
+                    <p class="text-gray-300">
+                        Transform written descriptions into high-quality videos with our advanced neural networks trained on diverse visual data.
+                    </p>
+                </div>
+
+                <div class="feature-card p-6 rounded-xl">
+                    <div class="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Multiple Styles</h3>
+                    <p class="text-gray-300">
+                        Choose from cinematic, animated, documentary, commercial, and artistic styles to match your creative vision.
+                    </p>
+                </div>
+
+                <div class="feature-card p-6 rounded-xl">
+                    <div class="w-12 h-12 bg-green-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Real-time Generation</h3>
+                    <p class="text-gray-300">
+                        Watch your video come to life in real-time with our optimized generation pipeline and instant preview capabilities.
+                    </p>
+                </div>
+
+                <div class="feature-card p-6 rounded-xl">
+                    <div class="w-12 h-12 bg-orange-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">4K Quality</h3>
+                    <p class="text-gray-300">
+                        Generate videos in stunning 4K resolution with professional-grade quality suitable for any platform or project.
+                    </p>
+                </div>
+
+                <div class="feature-card p-6 rounded-xl">
+                    <div class="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Audio Integration</h3>
+                    <p class="text-gray-300">
+                        Automatically generate synchronized audio tracks, sound effects, and background music for your videos.
+                    </p>
+                </div>
+
+                <div class="feature-card p-6 rounded-xl">
+                    <div class="w-12 h-12 bg-pink-500 rounded-lg flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Team Collaboration</h3>
+                    <p class="text-gray-300">
+                        Work together with your team in shared workspaces with version control and commenting features.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Statistics Section -->
+    <section class="py-16 px-6 reveal">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="stats-counter" data-target="2300000">0</div>
+                    <div class="text-gray-400 mt-2">Videos Created</div>
+                </div>
+                <div>
+                    <div class="stats-counter" data-target="150000">0</div>
+                    <div class="text-gray-400 mt-2">Active Users</div>
+                </div>
+                <div>
+                    <div class="stats-counter" data-target="95">0</div>
+                    <div class="text-gray-400 mt-2">Quality Score</div>
+                </div>
+                <div>
+                    <div class="stats-counter" data-target="120">0</div>
+                    <div class="text-gray-400 mt-2">Seconds Avg Gen</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="flex items-center justify-center space-x-3 mb-6">
+                <img src="resources/sora2-logo.png" alt="Sora 2" class="h-8 w-8">
+                <span class="text-xl font-bold text-gradient">Sora 2</span>
+            </div>
+            <p class="text-gray-400 mb-6">
+                © 2024 Sora 2 AI Video Generation Platform. All rights reserved.
+            </p>
+            <div class="text-sm text-gray-500">
+                Empowering creativity through artificial intelligence
+            </div>
+        </div>
+    </footer>
+
+    <script src="main.js"></script>
+</body>
+</html>
