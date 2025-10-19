@@ -5,9 +5,18 @@ let particles = [];
 let particleSystem;
 let generationInProgress = false;
 let currentProgress = 0;
+let videoData = [];
 
 // Initialize everything when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    // Load video data
+    fetch('resources/videos.json')
+        .then(response => response.json())
+        .then(data => {
+            videoData = data;
+        })
+        .catch(error => console.error('Error loading video data:', error));
+
     initParticleSystem();
     initScrollAnimations();
     initStatsCounters();
@@ -249,6 +258,43 @@ function initStyleSelector() {
     });
 }
 
+// Find best matching video based on prompt
+function findBestMatchingVideo(prompt) {
+    if (!videoData.length) return null;
+
+    const promptWords = prompt.toLowerCase().split(/\s+/);
+    let bestMatch = {
+        video: null,
+        score: 0
+    };
+
+    videoData.forEach(video => {
+        let score = 0;
+        const titleWords = video.title.toLowerCase();
+        const promptWordsInVideo = video.prompt.toLowerCase();
+
+        promptWords.forEach(word => {
+            if (titleWords.includes(word)) {
+                score++;
+            }
+            if (promptWordsInVideo.includes(word)) {
+                score += 0.5; // Give less weight to prompt matches
+            }
+        });
+
+        if (score > bestMatch.score) {
+            bestMatch = { video, score };
+        }
+    });
+
+    // If score is very low, it's not a good match
+    if (bestMatch.score < 2) {
+        return videoData[Math.floor(Math.random() * videoData.length)];
+    }
+
+    return bestMatch.video;
+}
+
 // Video generation simulation
 function generateVideo() {
     if (generationInProgress) return;
@@ -328,27 +374,56 @@ function completeGeneration() {
     const videoPreview = document.getElementById('video-preview');
     const generateBtn = document.getElementById('generate-btn');
     const progressContainer = document.getElementById('progress-container');
+    const prompt = document.getElementById('video-prompt').value.trim();
 
-    // Show completion message
-    videoPreview.innerHTML = `
-        <div class="text-center">
-            <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
+    const resultVideo = findBestMatchingVideo(prompt);
+
+    if (resultVideo) {
+        videoPreview.innerHTML = `
+            <div class="video-card p-4 w-full max-w-md mx-auto">
+                <div class="video-thumbnail">
+                    <div class="absolute inset-0 bg-gradient-to-br ${resultVideo.color} opacity-80"></div>
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <div class="w-16 h-16 bg-black bg-opacity-50 rounded-full flex items-center justify-center">
+                            <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-2 left-2 text-white text-sm font-semibold">${resultVideo.resolution} • ${resultVideo.duration}</div>
+                    <div class="absolute top-2 right-2">
+                        <div class="stats-badge">${resultVideo.views} views</div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h3 class="font-bold text-lg mb-2">${resultVideo.title}</h3>
+                    <p class="text-gray-400 text-sm mb-3 line-clamp-2">${resultVideo.prompt.substring(0, 100)}...</p>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-6 h-6 bg-cyan-500 rounded-full"></div>
+                            <span class="text-sm">${resultVideo.creator}</span>
+                        </div>
+                        <div class="text-xs text-gray-500">${resultVideo.date}</div>
+                    </div>
+                </div>
+                 <div class="flex gap-3 justify-center mt-4">
+                    <button class="btn-primary px-4 py-2 rounded-lg text-sm" onclick="downloadVideo()">
+                        Download MP4
+                    </button>
+                    <button class="btn-secondary px-4 py-2 rounded-lg text-sm" onclick="shareVideo()">
+                        Share
+                    </button>
+                </div>
             </div>
-            <h3 class="text-lg font-bold mb-2">Video Generated Successfully!</h3>
-            <p class="text-sm text-gray-400 mb-4">Your AI-generated video is ready for download</p>
-            <div class="flex gap-3 justify-center">
-                <button class="btn-primary px-4 py-2 rounded-lg text-sm" onclick="downloadVideo()">
-                    Download MP4
-                </button>
-                <button class="btn-secondary px-4 py-2 rounded-lg text-sm" onclick="shareVideo()">
-                    Share
-                </button>
+        `;
+    } else {
+        // Fallback if no videos are loaded
+        videoPreview.innerHTML = `
+            <div class="text-center">
+                <h3 class="text-lg font-bold mb-2">Could not generate video</h3>
+                <p class="text-sm text-gray-400">There was an error loading video data. Please try again later.</p>
             </div>
-        </div>
-    `;
+        `;
+    }
+
 
     // Reset button
     generateBtn.textContent = 'Generate Another Video';
