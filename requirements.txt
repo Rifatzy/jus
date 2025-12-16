@@ -1,0 +1,13 @@
+python-telegram-bot
+yt-dlp
+aiohttp
+aiofiles
+python-dotenv
+requests
+instaloader
+cachetools
+openai
+Pillow
+qrcode
+httpx
+groq
